@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.device.dao.DeviceRegisterDao">
+
+	<select id="get" resultType="com.bootdo.device.domain.DeviceRegisterDO">
+		select `id`,`device_type`,`status`,`device_id`,`create_date`,`create_by`,`handshake_date`,`belong`,`ip` from device where device_id = #{value}
+	</select>
+
+    <select id="getName" resultType="com.bootdo.device.domain.DeviceRegisterDO">
+		 select de.id,de.device_id,de.create_date,de.handshake_date,de.ip,ty.name AS device_type,st.status AS status,sur.username AS create_by,dept.name AS belong
+         from device AS de,type AS ty,status AS st,sys_user AS sur,sys_dept AS dept where device_id = #{value} AND de.device_type = ty.id AND de.status = st.id AND de.create_by = sur.user_id AND de.belong = dept.dept_id
+	</select>
+
+	<select id="list" resultType="com.bootdo.device.domain.DeviceRegisterDO">
+		select `id`,`device_type`,`status`,`device_id`,`create_date`,`create_by`,`handshake_date`,`belong`,`ip` from device
+        <where>
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="deviceType != null and deviceType != ''"> and device_type = #{deviceType} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="deviceId != null and deviceId != ''"> and device_id = #{deviceId} </if>
+		  		  <if test="createDate != null and createDate != ''"> and create_date = #{createDate} </if>
+		  		  <if test="createBy != null and createBy != ''"> and create_by = #{createBy} </if>
+		  		  <if test="handshakeDate != null and handshakeDate != ''"> and handshake_date = #{handshakeDate} </if>
+		  		  <if test="belong != null and belong != ''"> and belong = #{belong} </if>
+		  		  <if test="ip != null and ip != ''"> and ip = #{ip} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="listAll" resultType="com.bootdo.device.domain.DeviceRegisterDO">
+        select de.id,de.device_id,de.create_date,de.handshake_date,de.ip,ty.name AS device_type,st.status AS status,sur.username AS create_by,dept.name AS belong
+         from device AS de,type AS ty,status AS st,sys_user AS sur,sys_dept AS dept
+		<where>
+            de.device_type = ty.id AND de.status = st.id AND de.create_by = sur.user_id AND de.belong = dept.dept_id
+		</where>
+		<choose>
+			<when test="sort != null and sort.trim() != ''">
+				order by ${sort} ${order}
+			</when>
+			<otherwise>
+				order by de.id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from device
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="deviceType != null and deviceType != ''"> and device_type = #{deviceType} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="deviceId != null and deviceId != ''"> and device_id = #{deviceId} </if>
+		  		  <if test="createDate != null and createDate != ''"> and create_date = #{createDate} </if>
+		  		  <if test="createBy != null and createBy != ''"> and create_by = #{createBy} </if>
+		  		  <if test="handshakeDate != null and handshakeDate != ''"> and handshake_date = #{handshakeDate} </if>
+		  		  <if test="belong != null and belong != ''"> and belong = #{belong} </if>
+		  		  <if test="ip != null and ip != ''"> and ip = #{ip} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.device.domain.DeviceRegisterDO">
+		insert into device
+		(
+			`id`, 
+			`device_type`, 
+			`status`, 
+			`device_id`, 
+			`create_date`, 
+			`create_by`, 
+			`handshake_date`, 
+			`belong`, 
+			`ip`
+		)
+		values
+		(
+			#{id}, 
+			#{deviceType}, 
+			#{status}, 
+			#{deviceId}, 
+			#{createDate}, 
+			#{createBy}, 
+			#{handshakeDate}, 
+			#{belong}, 
+			#{ip}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.device.domain.DeviceRegisterDO">
+		update device 
+		<set>
+			<if test="deviceType != null">`device_type` = #{deviceType}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="deviceId != null">`device_id` = #{deviceId}, </if>
+			<if test="createDate != null">`create_date` = #{createDate}, </if>
+			<if test="createBy != null">`create_by` = #{createBy}, </if>
+			<if test="handshakeDate != null">`handshake_date` = #{handshakeDate}, </if>
+			<if test="belong != null">`belong` = #{belong}, </if>
+			<if test="ip != null">`ip` = #{ip}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from device where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from device where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>
